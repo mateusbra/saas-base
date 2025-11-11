@@ -27,12 +27,23 @@ export async function getCurrentUser(){
 }
 export async function createUser(data: { email: string; password: string }) {
     const hashed = await bcrypt.hash(data.password, 10);
-    return prisma.user.create({
-        data: {
+    try {
+        const user = await prisma.user.create({
+          data: {
             email: data.email,
             password: hashed,
-        },
-    });
+          },
+        });
+        return { success: true, user };
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          // duplicated email
+          return { success: false, message: "This e-mail is already registered" };
+        }
+    
+        console.error("error creating user:", error);
+        return { success: false, message: "internal error" };
+      }
 }
 
 
