@@ -1,18 +1,13 @@
-// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
+// Define where middleware runs
+export const config = {
+  matcher: ['/dashboard/:path','/dashboard'], // apply only where matches
+}
 
 export function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  // Ignore public pages
-  const publicPaths = ["/login", "/signup"];
-  if (publicPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
-
+  
   const token = req.cookies.get("session")?.value;
-
   if (!token) {
     // user not logged, redirect to login
     return NextResponse.redirect(new URL("/login", req.url));
