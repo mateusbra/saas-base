@@ -72,3 +72,8 @@ export async function signinAction(form: FormData) {
     console.log("logged in!");
     redirect("/dashboard");
 }
+export async function signoutAction(){
+    (await cookies()).delete("session");
+    console.log("user logged out!");
+    redirect("/login"); 
+}
