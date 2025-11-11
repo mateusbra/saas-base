@@ -3,7 +3,28 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { signToken, verifyToken } from "@/lib/jwt";
 
+export async function getCurrentUser(){
+    const cookieStore = cookies();
+    const token = (await cookieStore).get("session")?.value;
+  
+    if (!token) return null;
+  
+    try {
+      const payload = verifyToken(token) as { id: number };
+      if (!payload?.id) return null;
+  
+      const user = await prisma.user.findUnique({
+        where: { id: payload.id },
+      });
+  
+      return user;
+    } catch (err) {
+      console.log("Invalid JWT:", err);
+      return null;
+    }
+}
 export async function createUser(data: { email: string; password: string }) {
     const hashed = await bcrypt.hash(data.password, 10);
     return prisma.user.create({
@@ -34,17 +55,19 @@ export async function signinAction(form: FormData) {
         console.log("user not found");
         return;
     }
-
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
         console.log("password not valid");
         return;
     }
 
-    (await cookies()).set("session", user.id.toString(), {
+    const token = signToken({ id: user.id });
+
+    (await cookies()).set("session", token, {
         httpOnly: true,
         sameSite: "strict",
         path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
     });
     console.log("logged in!");
     redirect("/dashboard");
