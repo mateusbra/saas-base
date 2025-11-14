@@ -32,6 +32,7 @@ export async function createUser(data: { email: string; password: string }) {
           data: {
             email: data.email,
             password: hashed,
+            role: "USER",
           },
         });
         return { success: true, user };
@@ -53,6 +54,7 @@ export async function signupAction(form: FormData) {
     const password = form.get("password") as string;
 
     await createUser({ email, password });
+    redirect("/login");
 }
 
 export async function signinAction(form: FormData) {
