@@ -2,15 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 // Define where middleware runs
 export const config = {
-  matcher: ['/dashboard/:path','/dashboard'], // apply only where matches
+  matcher: ['/dashboard/:path*','/dashboard','/login','/signup'], // apply only where matches
 }
 
 export function proxy(req: NextRequest) {
   
-  const token = req.cookies.get("session")?.value;
+  const token = req.cookies.get("session")?.value as string;
   if (!token) {
     // user not logged, redirect to login
-    return NextResponse.redirect(new URL("/login", req.url));
+      if(! (req.nextUrl.pathname.startsWith('/login') || req.nextUrl.pathname.startsWith('/signup'))){
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+        return NextResponse.next();
+    
   }
 
   try {
@@ -18,6 +22,9 @@ export function proxy(req: NextRequest) {
     if (!user) throw new Error("Invalid token");
 
     // valid user, let it go through
+    if(req.nextUrl.pathname.startsWith('/login')|| req.nextUrl.pathname.startsWith('/signup')){
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
     return NextResponse.next();
   } catch (err) {
     // token invalid or expried
