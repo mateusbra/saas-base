@@ -1,4 +1,3 @@
-// app/page.tsx (home)
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/jwt";
 import { redirect } from "next/navigation";
@@ -10,11 +9,11 @@ export default async function Home() {
     const user = verifyToken(token);
     if (user) {
       console.log("user logged, redirecting to /dashboard");
-      redirect("/dashboard"); // usuário logado
+      redirect("/dashboard"); // user logged
     }
   }
 
-  // usuário não logado
+  // user not logged
   console.log("user not logged, redirecting to /login");
   redirect("/login");
 }

@@ -11,14 +11,24 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  role Role @default(USER)
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  projects  Project[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  description String? @db.Text
+  ownerId   Int
+  owner     User     @relation(fields: [ownerId], references: [id])
+  createdAt DateTime @default(now())
 }
