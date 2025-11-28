@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function ProjectDashboard({ projects }: Props) {
-    const [activeProjectID, setActiveProjectID] = useState<string | null>(projects[0].id);//sets the first project id
+    const [activeProjectID, setActiveProjectID] = useState<string | null>(projects[0]?.id || null);//sets the first project id
     const [isModalOpen, setIsModalOpen] = useState<Boolean>(false);
     const activeProject = projects.find(p => p.id == activeProjectID);
     return (
@@ -26,7 +26,7 @@ export default function ProjectDashboard({ projects }: Props) {
                 <div className="mr-10 border-l border-neutral-700" />
                 <main className="w-128 pt-20 ">
                     <h1 className="font-black text-4xl">Dashboard</h1>
-                    <h3 className="mt-10 text text-neutral-400">Seu projeto atual</h3>
+                    <h3 className="mt-10 text text-neutral-400">Description</h3>
                     <section className="mt-3 bg-neutral-800 rounded h-64 mr-10">
                         <div className="p-3" >{activeProject?.description ?? "no description"}</div>
                     </section>
