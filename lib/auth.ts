@@ -1,25 +1,33 @@
 import { cookies } from "next/headers";
 import prisma from "./prisma";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { redirect } from "next/navigation";
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 interface JWTPayload {
-    id: number;
-    iat?: number;
-    exp?: number;
-  }
-  
+  id: number;
+  iat?: number;
+  exp?: number;
+}
+
 export async function requireAdmin() {
   const token = (await cookies()).get("session")?.value;
-  console.log(token);
-  if (!token) 
+  if (!token) {
     redirect("/login");
+  }
+  try {
+    const data = jwt.verify(token, JWT_SECRET) as JWTPayload;
 
-  const data = jwt.verify(token, JWT_SECRET) as JWTPayload;
-  console.log(data);
-  const user = await prisma.user.findUnique({ where: { id: data.id } });
+    const user = await prisma.user.findUnique({ where: { id: data.id } });
 
-  if (!user || user.role !== "ADMIN") redirect("/dashboard");
+    if (!user || user.role !== "ADMIN") redirect("/dashboard");
 
-  return user;
+    return user;
+  } catch (err: any) {
+    console.log("JWT Error:", err.name);
+
+    if (err.name === "TokenExpiredError") {
+      console.log("Token expired");
+    }
+    redirect("/login");
+  }
 }
