@@ -12,16 +12,16 @@ export default function ProjectDashboard({ projects }: Props) {
     const [projectsList, setProjectsList] = useState<Project[]>(projects);
     const activeProject = projectsList.find(p => p.id == activeProjectID);
     return (
-        <div className="min-h-screen flex justify-center py-20 ">
-            <div className={"flex bg-neutral-900 rounded-lg"}>
-                <aside className="w-64 pl-10 pt-20">
+        <div className="min-h-screen flex justify-center py-8 px-4">
+            <div className="flex flex-col md:flex-row bg-neutral-900 rounded-lg w-full max-w-6xl">
+                <aside className="w-full md:w-64 p-6 md:pt-20 md:pl-10 border-b md:border-b-0 md:border-r border-neutral-700">
                     <h2 className="my-3 font-bold text-lg">Projects</h2>
                     <ul className="space-y-3">
                         {projectsList.map(p =>
                             <div key={p.id+"div"} className="flex items-center justify-between">
                             <li key={p.id+"li"} onClick={() => setActiveProjectID(p.id)}
                                 className={`cursor-pointer transition ${p.id === activeProjectID ? "font-semibold" : ""}`}>{p.name}</li>
-                                <button key={p.id+"button"} className="bg-red-500 text-white p-2 rounded mr-2 hover:bg-red-600 transition" onClick={async () => {
+                                <button key={p.id+"button"} className="bg-red-500 text-white p-1 rounded mr-2 hover:bg-red-600 transition" onClick={async () => {
                                     await deleteProject(p.id);
                                     const updatedList = projectsList.filter(pl => pl.id !== p.id);
                                     setProjectsList(updatedList);
@@ -34,7 +34,7 @@ export default function ProjectDashboard({ projects }: Props) {
                     <button onClick={() => setIsModalOpen(true)} className="bg-neutral-700 hover:bg-neutral-800 cursor-pointer rounded-lg p-2 mt-3 transition">+ New Project</button>
                 </aside>
                 <div className="mr-10 border-l border-neutral-700" />
-                <main className="w-128 pt-20 ">
+                <main className="flex-1 p-6 md:pt-20">
                     <h1 className="font-black text-4xl">Dashboard</h1>
                     <h3 className="mt-10 text text-neutral-400">Description</h3>
                     <section className="mt-3 bg-neutral-800 rounded h-64 mr-10">
