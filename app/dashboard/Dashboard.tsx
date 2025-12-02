@@ -1,10 +1,12 @@
 'use client'
 import { useRouter } from "next/navigation";
 import { User } from "@prisma/client";
+
 type DashboardProps = {
     user: User| null;
     signoutAction: () => Promise<void>;
 }
+
 export default function Dashboard({user,signoutAction}:DashboardProps) {
     const router = useRouter();
     return (

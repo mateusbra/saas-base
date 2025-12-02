@@ -1,7 +1,7 @@
 'use client'
 import { Project } from "@prisma/client";
 import { useState } from "react";
-
+import { deleteProject } from "@/services/userService";
 interface Props {
     projects: Project[];
 }
@@ -9,16 +9,26 @@ interface Props {
 export default function ProjectDashboard({ projects }: Props) {
     const [activeProjectID, setActiveProjectID] = useState<string | null>(projects[0]?.id || null);//sets the first project id
     const [isModalOpen, setIsModalOpen] = useState<Boolean>(false);
-    const activeProject = projects.find(p => p.id == activeProjectID);
+    const [projectsList, setProjectsList] = useState<Project[]>(projects);
+    const activeProject = projectsList.find(p => p.id == activeProjectID);
     return (
         <div className="min-h-screen flex justify-center py-20 ">
             <div className={"flex bg-neutral-900 rounded-lg"}>
                 <aside className="w-64 pl-10 pt-20">
                     <h2 className="my-3 font-bold text-lg">Projects</h2>
                     <ul className="space-y-3">
-                        {projects.map(p =>
-                            <li key={p.id} onClick={() => setActiveProjectID(p.id)}
+                        {projectsList.map(p =>
+                            <div key={p.id+"div"} className="flex items-center justify-between">
+                            <li key={p.id+"li"} onClick={() => setActiveProjectID(p.id)}
                                 className={`cursor-pointer transition ${p.id === activeProjectID ? "font-semibold" : ""}`}>{p.name}</li>
+                                <button key={p.id+"button"} className="bg-red-500 text-white p-2 rounded mr-2 hover:bg-red-600 transition" onClick={async () => {
+                                    await deleteProject(p.id);
+                                    const updatedList = projectsList.filter(pl => pl.id !== p.id);
+                                    setProjectsList(updatedList);
+                                    setActiveProjectID(updatedList[0]?.id || null);
+                                }
+                                 }>Delete</button>
+                                </div>
                         )}
                     </ul>
                     <button onClick={() => setIsModalOpen(true)} className="bg-neutral-700 hover:bg-neutral-800 cursor-pointer rounded-lg p-2 mt-3 transition">+ New Project</button>
