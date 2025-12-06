@@ -90,8 +90,3 @@ export async function signoutAction(){
     console.log("user logged out!");
     redirect("/login"); 
 }
-export async function deleteProject(projectId: string){
-    await prisma.project.delete({
-        where: { id: projectId }
-    })
-}

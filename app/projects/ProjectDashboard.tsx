@@ -1,12 +1,13 @@
 'use client'
-import { Project } from "@prisma/client";
+import { Project, User } from "@prisma/client";
 import { useState } from "react";
-import { deleteProject } from "@/services/userService";
+import { deleteProject } from "@/services/projectsService";
 interface Props {
+    user: User;
     projects: Project[];
 }
 
-export default function ProjectDashboard({ projects }: Props) {
+export default function ProjectDashboard({ user,projects }: Props) {
     const [activeProjectID, setActiveProjectID] = useState<string | null>(projects[0]?.id || null);//sets the first project id
     const [isModalOpen, setIsModalOpen] = useState<Boolean>(false);
     const [projectsList, setProjectsList] = useState<Project[]>(projects);
@@ -22,7 +23,7 @@ export default function ProjectDashboard({ projects }: Props) {
                             <li key={p.id+"li"} onClick={() => setActiveProjectID(p.id)}
                                 className={`cursor-pointer transition ${p.id === activeProjectID ? "font-semibold" : ""}`}>{p.name}</li>
                                 <button key={p.id+"button"} className="bg-red-500 text-white p-1 rounded mr-2 hover:bg-red-600 transition" onClick={async () => {
-                                    await deleteProject(p.id);
+                                    await deleteProject(user,p.id,projectsList);
                                     const updatedList = projectsList.filter(pl => pl.id !== p.id);
                                     setProjectsList(updatedList);
                                     setActiveProjectID(updatedList[0]?.id || null);
